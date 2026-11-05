@@ -35,13 +35,13 @@ const THEMES = {
   light: {
     levels: ["#ebedf0", "#9be9a8", "#40c463", "#30a14e", "#216e39"],
     blade: ["", "#73d487", "#2fa952", "#24863f", "#17532a"],
-    mowed: ["#c9e59a", "#b2d77c"],
+    mowed: ["#d4ebb6", "#c4e09f"],
     clip: "#5fae3c",
   },
   dark: {
     levels: ["#161b22", "#0e4429", "#006d32", "#26a641", "#39d353"],
     blade: ["", "#17603a", "#0b8a43", "#3cc45a", "#6af07c"],
-    mowed: ["#4b7a2c", "#3f6a24"],
+    mowed: ["#5a8541", "#4f783a"],
     clip: "#6cc04a",
   },
 };
@@ -53,131 +53,93 @@ const THEMES = {
 
 const PALETTE = {
   X: "#1e1a18", // outline
-  A: "#5cc261", // cap light
-  C: "#2f8a35", // cap
-  c: "#1c5e22", // cap shade
-  T: "#ffd9ad", // skin light
-  S: "#efb57c", // skin
-  s: "#c98752", // skin shade
+  T: "#ffd2a6", // skin light
+  S: "#eaa96f", // skin
+  s: "#c27f4c", // skin shade
   E: "#1d140c", // eye
-  h: "#6b4429", // hair
-  H: "#4a2c19", // hair shade
-  F: "#9fe09a", // shirt light
-  G: "#62b85d", // shirt
-  g: "#3e8a3a", // shirt shade
-  L: "#5d4037", // belt
-  P: "#6a9be0", // overalls light
-  O: "#3b70b5", // overalls
-  o: "#244a7c", // overalls shade
-  B: "#6d4c41", // boots
-  b: "#3e2723", // boots shade
-  I: "#e0e0e0", // handle light
-  J: "#8d8d8d", // handle shade
-  R: "#ff7a68", // mower light
-  M: "#e53935", // mower
-  m: "#9e2420", // mower shade
-  W: "#f4f4f4", // engine cover
-  w: "#b9b9b9", // engine shade
-  K: "#262626", // tyre
-  k: "#8a8a8a", // hub
+  h: "#5a3a26", // hair
+  H: "#3b2416", // hair shade
+  F: "#ff7a6b", // shirt light
+  G: "#d8352c", // shirt
+  g: "#8f1d18", // shirt shade
+  P: "#565b68", // trousers light
+  O: "#383d49", // trousers
+  o: "#22262e", // trousers shade
+  B: "#4a3a33", // boots
+  b: "#2a201c", // boots shade
+  I: "#b0b0b0", // handle light
+  J: "#5e5e5e", // handle shade
+  R: "#d3e0d6", // mower light
+  M: "#a6baac", // mower
+  m: "#6e8577", // mower shade
+  W: "#eef4ef", // engine cover
+  w: "#bccbc0", // engine shade
+  K: "#151515", // tyre
 };
 
+// A small figure, about 18 pixels tall, like a park worker seen from above.
 const HEAD_FRONT = [
-  "......XXXXX.....",
-  ".....XAAAACX....",
-  "....XAAAACCCX...",
-  "....XCCCCCCCXXXX",
-  "....XcccccccAAAcX",
-  "....XhhTTTTSXXXX",
-  "....XhTTTTETX...",
-  "....XHTTTTTSX...",
-  ".....XsTTTSsX...",
-  "......XXssXX....",
+  "...XXXX...",
+  "..XhhhhX..",
+  "..XhTTTSX.",
+  "..XhTTETX.",
+  "..XHTTTsX.",
+  "...XXssX..",
 ];
 const HEAD_BACK = [
-  "......XXXXX..XX.",
-  ".....XAAAACXXAcX",
-  "....XAAAACCCXcX.",
-  "....XCCCCCCCcX..",
-  "....XcccccccX...",
-  "....XhhhhhhhsX..",
-  "....XhhhhhhhSX..",
-  "....XHhhhhhHX...",
-  ".....XHhhhHX....",
-  "......XXssXX....",
+  "...XXXX...",
+  "..XhhhhX..",
+  "..XhhhhhX.",
+  "..XhhhhSX.",
+  "..XHhhhsX.",
+  "...XXssX..",
 ];
 const BODY_FRONT = [
-  "....XXFFGGGGXX....",
-  "...XFFFGGGGGGgX...",
-  "...XFFGGGGGGGgSX..",
-  "...XFgGGGGGGGgSSX.",
-  "...XFgGGGGGGGXXTSX",
-  "...XFgGGGGGGgX.XSX",
-  "...XggLLLLLLLoX...",
-  "....XPOOOOOOoX....",
-  "....XPOOOOOOoX....",
-  "....XPOOOOOOoX....",
+  "..XFGGGX...",
+  ".XFFGGGgX..",
+  ".XFGGGGgSX.",
+  ".XFgGGGXTSX",
+  ".XggGGgX.X.",
+  "..XOOOOoX..",
+  "..XPOOOoX..",
 ];
 const BODY_BACK = [
-  "....XXFFGGGGXX....",
-  "...XFFFGGGGGGgX...",
-  "...XFFGGgGGGGgSX..",
-  "...XFgGGgGGGGgSSX.",
-  "...XFgGGgGGGGgXTSX",
-  "...XFgGGgGGGGgXXX.",
-  "...XggLLLLLLLoX...",
-  "....XPOoOOOOoX....",
-  "....XPOOOOOOoX....",
-  "....XPOOOOOOoX....",
+  "..XFGGGX...",
+  ".XFFGGGgX..",
+  ".XFGgGGgSX.",
+  ".XFgGgGgSX.",
+  ".XggGgGgX..",
+  "..XOOOOoX..",
+  "..XPOOOoX..",
 ];
 const LEGS = [
   [
-    "....XPOOOXOOoX....",
-    "....XPOoXXPOoX....",
-    "...XPOoX..XPOoX...",
-    "...XPOoX...XPOoX..",
-    "...XPOoX...XPOoX..",
-    "..XBBBbX....XBBBX.",
-    "..XBBBBbX...XBBBBX",
-    "...XXXXX.....XXXXX",
+    "..XPoXOoX..",
+    ".XPoX.XOoX.",
+    ".XPoX.XOoX.",
+    ".XbBX..XbBX",
+    "..XX....XX.",
   ],
   [
-    "....XPOOOOOOoX....",
-    "....XPOOOOOOoX....",
-    ".....XPOoPOoX.....",
-    ".....XPOoPOoX.....",
-    ".....XPOoPOoX.....",
-    "....XBBBBBBbX.....",
-    "....XBBBBBBBbX....",
-    ".....XXXXXXXX.....",
+    "..XPOOOoX..",
+    "...XPOoX...",
+    "...XPOoX...",
+    "...XbBBX...",
+    "....XXX....",
   ],
 ];
 const MOWER = [
-  "..XXXXXXXX..",
-  ".XRRRRRRRMX.",
-  "XRRXWWWXRMMX",
-  "XRRXwWWXMMmX",
-  "XRRRXXXMMMmX",
-  "XMMMMMMMMMmX",
-  "XmmmmmmmmmmX",
-  ".XKkX..XKkX.",
-  "..XX....XX..",
+  ".XXXXXX.",
+  "XRRWWRMX",
+  "XRMwwMmX",
+  "XMMMMMmX",
+  ".XKXXKX.",
+  "..X..X..",
 ];
-const HANDLE_FRONT = [
-  "IJ...",
-  "IJ...",
-  ".IJ..",
-  ".IJ..",
-  "..IJ.",
-  "..IJ.",
-  "...IJ",
-  "...IJ",
-];
-const HANDLE_BACK = ["IIJ..", "..IIJ"];
 
 // Feet sit here on the canvas.
-const ANCHOR_X = 10;
-const ANCHOR_Y = 34;
+const ANCHOR_X = 5;
+const ANCHOR_Y = 24;
 
 function compose(layers, w = 34, h = 40) {
   const grid = Array.from({ length: h }, () => Array(w).fill("."));
@@ -211,17 +173,20 @@ function pixels(rows) {
 
 // Person layers sit with the feet (last legs row) on ANCHOR_Y.
 // The mower is pushed close in front of him, so it stays over the tile he mows.
-const PERSON_TOP = ANCHOR_Y - 27;
-const FRONT_MOWER = { x: 13, y: PERSON_TOP + 22 };
-const BACK_MOWER = { x: 13, y: PERSON_TOP + 14 };
-const SHORT_HANDLE = ["IJ", "IJ", "IJ", "IJ", "IJ", "IJ"];
+const SPRITE_H = HEAD_FRONT.length + BODY_FRONT.length + LEGS[0].length - 1;
+const PERSON_TOP = ANCHOR_Y - SPRITE_H;
+const BODY_TOP = PERSON_TOP + HEAD_FRONT.length;
+const LEGS_TOP = BODY_TOP + BODY_FRONT.length;
+const FRONT_MOWER = { x: 7, y: PERSON_TOP + 14 };
+const BACK_MOWER = { x: 7, y: PERSON_TOP + 9 };
+const SHORT_HANDLE = ["IJ", "IJ", "IJ", "IJ"];
 
 function frontFrame(legs) {
   return compose([
     { art: HEAD_FRONT, x: 0, y: PERSON_TOP },
-    { art: BODY_FRONT, x: 0, y: PERSON_TOP + 10 },
-    { art: legs, x: 0, y: PERSON_TOP + 20 },
-    { art: SHORT_HANDLE, x: 16, y: PERSON_TOP + 16 },
+    { art: BODY_FRONT, x: 0, y: BODY_TOP },
+    { art: legs, x: 0, y: LEGS_TOP },
+    { art: SHORT_HANDLE, x: 9, y: BODY_TOP + 4 },
     { art: MOWER, ...FRONT_MOWER },
   ]);
 }
@@ -229,8 +194,8 @@ function backFrame(legs) {
   return compose([
     { art: MOWER, ...BACK_MOWER },
     { art: HEAD_BACK, x: 0, y: PERSON_TOP },
-    { art: BODY_BACK, x: 0, y: PERSON_TOP + 10 },
-    { art: legs, x: 0, y: PERSON_TOP + 20 },
+    { art: BODY_BACK, x: 0, y: BODY_TOP },
+    { art: legs, x: 0, y: LEGS_TOP },
   ]);
 }
 
@@ -248,8 +213,9 @@ function view(frames, clipAt, color) {
 
 // ---------- layout and timing ----------
 
-const CELL = 11;
-const PITCH = 14;
+const WEEKS = 26; // show the last six months so the squares can be big
+const CELL = 24;
+const PITCH = 28;
 const ROWS = 7;
 const WALK_SPEED = 26; // px per second between tiles
 const MOW_SPEED = 13; // px per second while mowing
@@ -279,7 +245,7 @@ const STRIPES = [
   { k: 0, dir: "NW" },
   { k: CELL * (2 / 3), dir: "SE" },
 ];
-const OVERRUN = 2; // mower runs a little past the tile edge
+const OVERRUN = 3; // mower runs a little past the tile edge
 
 function passEnds(k, dir) {
   // Ends of the line u - v = k inside the tile, plus a little overrun.
@@ -291,7 +257,11 @@ function passEnds(k, dir) {
 
 function build(cells, theme) {
   const t = THEMES[theme];
-  const cols = Math.max(...cells.map((x) => x.c)) + 1;
+  // Keep only the most recent WEEKS columns.
+  const lastCol = Math.max(...cells.map((x) => x.c));
+  const firstCol = Math.max(0, lastCol - WEEKS + 1);
+  cells = cells.filter((x) => x.c >= firstCol).map((x) => ({ ...x, c: x.c - firstCol }));
+  const cols = lastCol - firstCol + 1;
   const W = cols * PITCH - (PITCH - CELL);
   const H = ROWS * PITCH - (PITCH - CELL);
   const centerOf = (cell) => [cell.c * PITCH + CELL / 2, cell.r * PITCH + CELL / 2];
@@ -414,7 +384,7 @@ function build(cells, theme) {
   const bandEdges = [-CELL, -CELL / 3, CELL / 3, CELL];
   const band = (x, y, i) => {
     const [k1, k2] = [bandEdges[i], bandEdges[i + 1]];
-    const L = 12;
+    const L = CELL;
     const p = [
       [k1 / 2 - L, -k1 / 2 - L],
       [k1 / 2 + L, -k1 / 2 + L],
@@ -423,12 +393,25 @@ function build(cells, theme) {
     ];
     return p.map(([u, v]) => `${(x + u).toFixed(2)},${(y + v).toFixed(2)}`).join(" ");
   };
-  // Blade spots for each band, so each pass clears its own blades.
-  const BLADES = [
-    [[-3.6, 3.4], [-1.2, 4.6]],
-    [[-2.6, -1.4], [0.4, 0.8], [2.8, 3.2]],
-    [[1.2, -3.6], [3.8, -2.0]],
-  ];
+  // Tufts of long grass scattered over each band, so each pass clears its own.
+  // A small seeded random keeps the same tile looking the same every day.
+  const rng = (seed) => () => {
+    seed = (seed * 1664525 + 1013904223) >>> 0;
+    return seed / 2 ** 32;
+  };
+  const tuftsFor = (cell, i) => {
+    const rand = rng(cell.c * 131 + cell.r * 17 + i * 7 + 1);
+    const [k1, k2] = [bandEdges[i] + 1.5, bandEdges[i + 1] - 1.5];
+    const want = (i === 1 ? 3 : 2) + Math.ceil(cell.level / 2);
+    const out = [];
+    for (let tries = 0; out.length < want && tries < 200; tries++) {
+      const u = (rand() - 0.5) * CELL * 0.8;
+      const v = (rand() - 0.5) * CELL * 0.8 + 2;
+      if (u - v >= k1 && u - v <= k2) out.push([u, v, rand()]);
+    }
+    return out;
+  };
+  const speck = theme === "dark" ? "#a6d98f" : "#f3f8df";
 
   let css = "";
   let defs = "";
@@ -437,7 +420,7 @@ function build(cells, theme) {
   for (const cell of cells) {
     const x = cell.c * PITCH;
     const y = cell.r * PITCH;
-    const rect = `x="${x}" y="${y}" width="${CELL}" height="${CELL}" rx="2"`;
+    const rect = `x="${x}" y="${y}" width="${CELL}" height="${CELL}" rx="4"`;
     if (cell.level === 0) {
       ground += `<rect ${rect} fill="${t.levels[0]}"/>`;
       continue;
@@ -450,20 +433,27 @@ function build(cells, theme) {
       .map((i) => `<polygon points="${band(cx, cy, i)}" fill="${t.mowed[i % 2]}"/>`)
       .join("")}</g>`;
     const times = cutTimes.get(cell);
-    const h = 2 + cell.level * 0.9; // taller blades for busier days
+    const h = 2.5 + cell.level * 1.2; // longer grass on busier days
+    const f = (n) => n.toFixed(2);
     [0, 1, 2].forEach((i) => {
       const id = `g${cell.r}_${cell.c}_${i}`;
       css += hideAt(id, times[i]);
-      const blades = BLADES[i]
-        .map(([u, v]) => {
-          const bx = cx + u;
-          const by = cy + v;
-          return `M${(bx - 1.1).toFixed(2)} ${by.toFixed(2)}L${bx.toFixed(2)} ${(by - h).toFixed(2)}L${(bx + 1.1).toFixed(2)} ${by.toFixed(2)}Z`;
-        })
-        .join("");
+      let blades = "";
+      let specks = "";
+      for (const [u, v, r] of tuftsFor(cell, i)) {
+        const bx = cx + u;
+        const by = cy + v;
+        const th = h * (0.75 + r * 0.5);
+        // A tuft: three blades fanning out.
+        blades +=
+          `M${f(bx - 1)} ${f(by)}L${f(bx)} ${f(by - th)}L${f(bx + 1)} ${f(by)}Z` +
+          `M${f(bx - 2)} ${f(by)}L${f(bx - 3)} ${f(by - th * 0.7)}L${f(bx - 0.5)} ${f(by)}Z` +
+          `M${f(bx + 0.5)} ${f(by)}L${f(bx + 3)} ${f(by - th * 0.7)}L${f(bx + 2)} ${f(by)}Z`;
+        if (r > 0.6) specks += `<rect x="${f(bx + 3)}" y="${f(by - 1)}" width="1.2" height="1.2"/>`;
+      }
       tall +=
         `<g class="${id}"><polygon clip-path="url(#${clip})" points="${band(cx, cy, i)}" fill="${t.levels[cell.level]}"/>` +
-        `<path d="${blades}" fill="${t.blade[cell.level]}"/></g>`;
+        `<path d="${blades}" fill="${t.blade[cell.level]}"/><g fill="${speck}">${specks}</g></g>`;
     });
   }
 
@@ -494,9 +484,9 @@ ${Object.keys(FACING)
 `;
 
   // ---------- frame ----------
-  const padX = 34; // room for the whole sprite at the side walls
-  const padTop = ANCHOR_Y - CELL / 2 + 12;
-  const padBottom = 12;
+  const padX = 20; // room for the whole sprite at the side walls
+  const padTop = Math.max(SPRITE_H - CELL / 2, 0) + 10;
+  const padBottom = 10;
   const vbW = W + padX * 2;
   const vbH = H + padTop + padBottom;
 
