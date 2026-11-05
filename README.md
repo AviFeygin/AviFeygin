@@ -1,5 +1,10 @@
 ## Hi there 👋
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/AviFeygin/AviFeygin/output/mower-dark.svg">
+  <img alt="A groundskeeper mowing my contribution graph" src="https://raw.githubusercontent.com/AviFeygin/AviFeygin/output/mower.svg">
+</picture>
+
 <!--
 **AviFeygin/AviFeygin** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
 
