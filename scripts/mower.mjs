@@ -181,7 +181,34 @@ const FRONT_MOWER = { x: 7, y: PERSON_TOP + 14 };
 const BACK_MOWER = { x: 7, y: PERSON_TOP + 9 };
 const SHORT_HANDLE = ["IJ", "IJ", "IJ", "IJ"];
 
-function frontFrame(legs) {
+// Walking between tiles he puts the mower away, arms at his sides.
+const BODY_FRONT_WALK = [
+  "..XFGGGX..",
+  ".XFFGGGgX.",
+  "XFFGGGGggX",
+  "XFgGGGGggX",
+  "XSgGGGGgSX",
+  "XXXOOOOoXX",
+  "..XPOOOoX.",
+];
+const BODY_BACK_WALK = [
+  "..XFGGGX..",
+  ".XFFGGGgX.",
+  "XFFGgGGggX",
+  "XFgGgGGggX",
+  "XSgGgGGgSX",
+  "XXXOOOOoXX",
+  "..XPOOOoX.",
+];
+
+function frontFrame(legs, mowing) {
+  if (!mowing) {
+    return compose([
+      { art: HEAD_FRONT, x: 0, y: PERSON_TOP },
+      { art: BODY_FRONT_WALK, x: 0, y: BODY_TOP },
+      { art: legs, x: 0, y: LEGS_TOP },
+    ]);
+  }
   return compose([
     { art: HEAD_FRONT, x: 0, y: PERSON_TOP },
     { art: BODY_FRONT, x: 0, y: BODY_TOP },
@@ -190,7 +217,14 @@ function frontFrame(legs) {
     { art: MOWER, ...FRONT_MOWER },
   ]);
 }
-function backFrame(legs) {
+function backFrame(legs, mowing) {
+  if (!mowing) {
+    return compose([
+      { art: HEAD_BACK, x: 0, y: PERSON_TOP },
+      { art: BODY_BACK_WALK, x: 0, y: BODY_TOP },
+      { art: legs, x: 0, y: LEGS_TOP },
+    ]);
+  }
   return compose([
     { art: MOWER, ...BACK_MOWER },
     { art: HEAD_BACK, x: 0, y: PERSON_TOP },
@@ -204,11 +238,14 @@ const mowerMid = (m) => [m.x + MOWER[0].length / 2 - ANCHOR_X, m.y + MOWER.lengt
 const FRONT_OFF = mowerMid(FRONT_MOWER);
 const BACK_OFF = mowerMid(BACK_MOWER);
 
-function view(frames, clipAt, color) {
+function view(frame, clipAt, color) {
+  // Two versions of each view: mowing (mower out, clippings flying) and walking.
   const clips = [0, 1, 2, 3]
     .map((i) => `<rect class="clip c${i}" x="${clipAt[0]}" y="${clipAt[1] - 3}" width="1.5" height="1.5" fill="${color}"/>`)
     .join("");
-  return `<g class="legA">${pixels(frames[0])}</g><g class="legB">${pixels(frames[1])}</g>` + clips;
+  const steps = (mowing) =>
+    `<g class="legA">${pixels(frame(LEGS[0], mowing))}</g><g class="legB">${pixels(frame(LEGS[1], mowing))}</g>`;
+  return `<g class="mw">${steps(true)}${clips}</g><g class="wk">${steps(false)}</g>`;
 }
 
 // ---------- layout and timing ----------
@@ -220,6 +257,7 @@ const ROWS = 7;
 const WALK_SPEED = 26; // px per second between tiles
 const MOW_SPEED = 13; // px per second while mowing
 const TURN_TIME = 0.35; // seconds to swing the mower round between passes
+const MOWER_OUT = 0.5; // seconds to get the mower out or put it away
 const PAUSE = 4; // seconds to admire the finished lawn
 const REGROW = 1.5; // seconds for the grass to grow back
 
@@ -288,18 +326,22 @@ function build(cells, theme) {
     here = centerOf(best);
   }
 
-  // Segments of the walk: {from, to, dur, face}.
+  // Segments of the walk: {from, to, dur, face, mow}.
   const segs = [];
   let pos = [-70, H / 2];
   let face = "SE";
-  const go = (to, speed, forceFace) => {
+  const go = (to, speed, forceFace, mow = false) => {
     const dx = to[0] - pos[0];
     const dy = to[1] - pos[1];
     const len = Math.hypot(dx, dy);
     if (len < 1e-6) return;
     face = forceFace || facingOf(dx, dy, face);
-    segs.push({ from: pos, to, dur: len / speed, face });
+    segs.push({ from: pos, to, dur: len / speed, face, mow });
     pos = to;
+  };
+  const stand = (dur, mow, faceTo = face) => {
+    face = faceTo;
+    segs.push({ from: pos, to: pos, dur, face, mow });
   };
   const walkTo = (to) => {
     // Only diagonal moves: go diagonally, then zigzag the rest of the way.
@@ -339,20 +381,20 @@ function build(cells, theme) {
       const [a, b] = passEnds(k, dir);
       const start = [cx + a[0] - off[0], cy + a[1] - off[1]];
       const end = [cx + b[0] - off[0], cy + b[1] - off[1]];
-      if (i === 0) walkTo(start);
-      else {
+      if (i === 0) {
+        walkTo(start);
+        stand(MOWER_OUT, true, dir); // get the mower out
+      } else {
         // Swing round to line up the next pass.
-        const dx = start[0] - pos[0];
-        const dy = start[1] - pos[1];
-        segs.push({ from: pos, to: start, dur: TURN_TIME, face: dir });
+        segs.push({ from: pos, to: start, dur: TURN_TIME, face: dir, mow: true });
         pos = start;
         face = dir;
-        void dx, dy;
       }
       const t0 = clock();
-      go(end, MOW_SPEED, dir);
+      go(end, MOW_SPEED, dir, true);
       times.push(t0 + (clock() - t0) / 2);
     });
+    stand(MOWER_OUT, false); // put it away before walking on
     cutTimes.set(tile, times);
   }
   walkTo([W + 80, H / 2]);
@@ -365,11 +407,15 @@ function build(cells, theme) {
   let time = 0;
   const moveKf = [];
   const turns = [];
+  const modes = [];
   for (const s of segs) {
     moveKf.push(`${pct(time)}{transform:${px(s.from)}}`);
     if (!turns.length || turns[turns.length - 1][1] !== s.face) turns.push([time, s.face]);
+    if (!modes.length || modes[modes.length - 1][1] !== s.mow) modes.push([time, s.mow]);
     time += s.dur;
   }
+  const modeKf = (on) =>
+    modes.map(([s, m]) => `${pct(s)}{opacity:${m === on ? 1 : 0}}`).join("") + `100%{opacity:${on ? 0 : 1}}`;
   moveKf.push(`${pct(time)}{transform:${px(pos)}}`, `100%{transform:${px(pos)}}`);
   const showKf = (name) =>
     turns.map(([s, n]) => `${pct(s)}{opacity:${n === name ? 1 : 0}}`).join("") + "100%{opacity:0}";
@@ -458,8 +504,8 @@ function build(cells, theme) {
   }
 
   // ---------- sprite ----------
-  const front = view([frontFrame(LEGS[0]), frontFrame(LEGS[1])], FRONT_OFF, t.clip);
-  const back = view([backFrame(LEGS[0]), backFrame(LEGS[1])], BACK_OFF, t.clip);
+  const front = view(frontFrame, FRONT_OFF, t.clip);
+  const back = view(backFrame, BACK_OFF, t.clip);
   const facings = Object.entries(FACING)
     .map(([name, f]) => `<g class="d${name}"><g transform="scale(${f.flip},1)">${f.view === "front" ? front : back}</g></g>`)
     .join("");
@@ -471,6 +517,8 @@ function build(cells, theme) {
 ${Object.keys(FACING)
   .map((n) => `@keyframes s${n}{${showKf(n)}}.d${n}{animation:s${n} ${dur} step-end infinite}`)
   .join("\n")}
+@keyframes mw{${modeKf(true)}}.mw{animation:mw ${dur} step-end infinite}
+@keyframes wk{${modeKf(false)}}.wk{animation:wk ${dur} step-end infinite}
 @keyframes stepA{0%,49.9%{opacity:1}50%,100%{opacity:0}}
 @keyframes stepB{0%,49.9%{opacity:0}50%,100%{opacity:1}}
 .legA{animation:stepA .5s linear infinite}
