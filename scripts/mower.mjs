@@ -23,7 +23,7 @@ async function loadCalendar() {
     const id = tag.match(/contribution-day-component-(\d+)-(\d+)/);
     const level = tag.match(/data-level="(\d)"/);
     if (!id || !level) continue;
-    cells.push({ r: +id[1], c: +id[2], level: +level[1] });
+    cells.push({ r: +id[1], c: +id[2], level: +level[1], date: m[1] });
   }
   if (cells.length < 7) throw new Error(`No calendar cells found for ${user}`);
   return cells;
@@ -37,12 +37,14 @@ const THEMES = {
     blade: ["", "#73d487", "#2fa952", "#24863f", "#17532a"],
     mowed: ["#d4ebb6", "#c4e09f"],
     clip: "#5fae3c",
+    label: "#59636e",
   },
   dark: {
     levels: ["#161b22", "#0e4429", "#006d32", "#26a641", "#39d353"],
     blade: ["", "#17603a", "#0b8a43", "#3cc45a", "#6af07c"],
     mowed: ["#5a8541", "#4f783a"],
     clip: "#6cc04a",
+    label: "#9198a1",
   },
 };
 
@@ -531,11 +533,40 @@ ${Object.keys(FACING)
 .c3{--dx:-9px;--dy:-5px;animation-delay:-.45s}
 `;
 
+  // ---------- labels ----------
+  // Month names along the top and Mon, Wed, Fri down the side, like GitHub's graph.
+  const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const monthOfCol = [];
+  for (const cell of cells) {
+    const m = new Date(cell.date + "T00:00:00Z").getUTCMonth();
+    if (monthOfCol[cell.c] === undefined || cell.r === 0) monthOfCol[cell.c] = m;
+  }
+  const starts = [];
+  monthOfCol.forEach((m, c) => {
+    if (c === 0 || m !== monthOfCol[c - 1]) starts.push({ c, m });
+  });
+  // Drop a label that would sit on top of the next one, as GitHub does.
+  const monthLabels = starts.filter((s, i) => !starts[i + 1] || starts[i + 1].c - s.c >= 2);
+  const font = `font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans',Helvetica,Arial,sans-serif" font-size="13" fill="${t.label}"`;
+  const labels =
+    `<g ${font}>` +
+    monthLabels.map(({ c, m }) => `<text x="${c * PITCH}" y="-8">${MONTHS[m]}</text>`).join("") +
+    [
+      [1, "Mon"],
+      [3, "Wed"],
+      [5, "Fri"],
+    ]
+      .map(([r, d]) => `<text x="-8" y="${r * PITCH + CELL / 2}" text-anchor="end" dominant-baseline="central">${d}</text>`)
+      .join("") +
+    `</g>`;
+
   // ---------- frame ----------
-  const padX = 20; // room for the whole sprite at the side walls
-  const padTop = Math.max(SPRITE_H - CELL / 2, 0) + 10;
+  const padLeft = 40; // weekday labels
+  const padRight = 20; // room for the sprite at the right wall
+  const padTop = Math.max(SPRITE_H - CELL / 2 + 10, 26); // month labels
   const padBottom = 10;
-  const vbW = W + padX * 2;
+  const padX = padLeft;
+  const vbW = W + padLeft + padRight;
   const vbH = H + padTop + padBottom;
 
   return {
@@ -544,6 +575,7 @@ ${Object.keys(FACING)
       `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${-padX} ${-padTop} ${vbW} ${vbH}" width="${vbW}" height="${vbH}">` +
       `<title>A groundskeeper mowing ${user}'s contribution graph</title>` +
       `<defs>${defs}</defs><style>${css}</style>` +
+      labels +
       ground +
       tall +
       `<g class="mover" shape-rendering="crispEdges">${facings}</g>` +
